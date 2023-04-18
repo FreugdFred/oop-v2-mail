@@ -42,6 +42,7 @@ class LoadGooglePage:
         return any(x in html_page for x in self.PAGEENDINGSLIST) or time.time() - start_time > 180
     
     def Googlepage(self):
+        allhrefsList = []
         start_time = time.time()
         with sync_playwright() as plays:
 
@@ -53,19 +54,18 @@ class LoadGooglePage:
             page.goto(self.URL)
             page.wait_for_timeout(3000)
 
-            # with contextlib.suppress(Exception):
+            with contextlib.suppress(Exception):
                 # while not end of page text and not longer then 180 seconds
+                while True:
+                        html_page = page.content()
+                        allhrefsList = list(self.Gethref(html_page))
+                        last_href = allhrefsList[-1]
+
+                        self.Scrolltohref(page, last_href)
+                        if self.Stopscrolling(start_time, html_page):
+                            break
                 
-            while True:
-                    html_page = page.content()
-                    allhrefsList = list(self.Gethref(html_page))
-                    last_href = allhrefsList[-1]
-                    
-                    self.Scrolltohref(page, last_href)
-                    if self.Stopscrolling(start_time, html_page):
-                        break
-                            
-            return allhrefsList
+                return allhrefsList
             
                 
                 

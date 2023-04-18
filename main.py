@@ -19,7 +19,6 @@ def Getemails(keywords, email):
     href_list = PlaywrightClass.Printhrefs()
     cleaned_hreflist = CleanHrefs(href_list)
     
-    
     for cleaned in cleaned_hreflist:
         print(cleaned)
 
