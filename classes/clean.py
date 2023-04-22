@@ -54,7 +54,7 @@ class CleanHrefs:
 
             if 'u003d' in lines:
                 parsed_url =  lines.replace('u003d', '')
-                return urlparse(parsed_url).netloc
+                return f"http://{urlparse(parsed_url).netloc}"
 
         return None
 

@@ -10,8 +10,9 @@ filename = filename
 from classes.info import UserInfo
 from classes.play import LoadGooglePage
 from classes.clean import CleanHrefs
+from classes.parse import ParseUrls
 
-from testlist import hreflist
+from testlist import url_list
 
 
 # def Getemails(keywords, email):
@@ -27,7 +28,9 @@ from testlist import hreflist
 # Getemails('restaurants purmerend', 'vossjea@gmail.com')
 
 
-hrefClass = CleanHrefs(hreflist)
+# hrefClass = CleanHrefs(hreflist)
+
+ParsedClass = ParseUrls(url_list)
 
 
 
