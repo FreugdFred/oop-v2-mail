@@ -1,60 +1,60 @@
+from urllib.parse import urlparse
 import requests
-from bs4 import BeautifulSoup
 import re
 import time
+
 
 class CleanHrefs:
     def __init__(self, hrefList):
         self.hrefList = hrefList
-        self.google_bool = self.Checkifgooglehref()
+        self.google_bool = self.Checkamountgooglehref()
         
         self.HTTPLIST = ['https://', 'http://']
-        self.SKIP_URL_LIST = ['google', '.png', 'gstatic', 'broofa.com', 'ggpht.', 'schema.org', 'w3.org']
+        self.SKIP_URL_LIST = ['google', '.png', 'gstatic', 'broofa.com', 'ggpht.', 'schema.org', 'w3.org', 'https://g.page/']
         self.SKIPHREF_LIST = ['ServiceLogin?', 'products?', 'no_javascript', '/reserve/']
         self.USERAGENT_REQUEST = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11', 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3', 'Accept-Encoding': 'none', 'Accept-Language': 'en-US,en;q=0.8', 'Connection': 'keep-alive', 'Content-Encoding': 'gzip', 'Content-Type': 'text/html; charset=utf-8'}
         self.GOOGLE_COOKIE_REQUEST = {'CONSENT' : 'YES+'}
-          
-          
-        if not self.google_bool:
-            for href in self.hrefList:
-                print(self.geturlfromplace(href))
-                time.sleep(1)
-                
-            
-    # def Geturlfromplace(self, html_page) -> list:
-    #     # get all ancher tags and hrefs, then look if href doesnt contain special string in SKIPHREF_LIST
-    #     soup = BeautifulSoup(html_page, 'lxml')
-    #     hrefItter = (link.get('href') for link in soup.find_all('a') if link.get('href'))
-    #     return (href for href in hrefItter if not any(x for x in self.SKIPHREF_LIST if x in href))
         
-    def Checkifgooglehref(self) -> bool:
+        # if more then 30% url are not from google then Removegoogleurls() else Geturlfromplace()
+        if self.google_bool:
+            self.cleaned_urls = [self.Removegoogleurls(href) for href in self.hrefList]
+        else:
+            non_google_url_list = [self.Removenongoogleurls(href) for href in self.hrefList]
+            self.cleaned_urls = [self.Geturlfromplace(href) for href in non_google_url_list]
+            
+        # remove all none values for list
+        self.cleaned_urls = list(filter(lambda item: item is not None, self.cleaned_urls))
+        
+    
+    def Removenongoogleurls(self, url):
+        # if google not in url the return None else return url
+        return url if 'google' in url else None
+                
+    def Removegoogleurls(self, url):
+        # return url if url does not conatin componemnts of SKIP_URL_LIST
+        return url if all(x not in url for x in self.SKIP_URL_LIST) else None
+        
+    def Checkamountgooglehref(self) -> bool:
         # sourcery skip: inline-variable, simplify-numeric-comparison
         # return True if more then 30% are not google links
         nogoogle_amount = sum('www.google' not in href for href in self.hrefList)
         nogoogle_percentage = nogoogle_amount / len(self.hrefList) * 100
         return nogoogle_percentage > 30
     
-    # def geturlfromplace(self, href) -> str or None:
-    #     html_request_body = requests.get(href, headers=self.USERAGENT_REQUEST, cookies=self.GOOGLE_COOKIE_REQUEST).text
-
-    #     soup = BeautifulSoup(html_request_body, 'lxml')
-    #     hrefItter = (link.get('href') for link in soup.find_all('a') if link.get('href'))
-    #     allhrefs = (href for href in hrefItter if not any(x for x in self.SKIPHREF_LIST if x in href))
-
-    #     for href in hrefItter:
-    #         print(f'href: {href}')
-
-    #     return next((href_page for href_page in allhrefs if all(x not in href_page for x in self.SKIP_URL_LIST) and any(x in href_page for x in self.HTTPLIST)), None)
-    
-    
-    def geturlfromplace(self, href) -> str or None:
+    def Geturlfromplace(self, href) -> str or None:
         html_request_body = requests.get(href, headers=self.USERAGENT_REQUEST, cookies=self.GOOGLE_COOKIE_REQUEST).text
 
-        soup = BeautifulSoup(html_request_body, 'lxml')
+        # dont let google block us :)
+        time.sleep(0.5)
 
-        href_tags = soup.find_all(href=True)
-        for href in href_tags:
-            print("Found the URL:", href['href'])
-            
+        for lines in re.split(r'"|\\', html_request_body):
+            # if line contains SKIP_URL_LIST components or does not contain HTTPLIST then go trough next loop
+            if all(x not in lines for x in self.HTTPLIST) or any(x in lines for x in self.SKIP_URL_LIST):
+                continue
+
+            if 'u003d' in lines:
+                parsed_url =  lines.replace('u003d', '')
+                return urlparse(parsed_url).netloc
+
         return None
 
