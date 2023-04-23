@@ -11,8 +11,10 @@ from classes.info import UserInfo
 from classes.play import LoadGooglePage
 from classes.clean import CleanHrefs
 from classes.parse import ParseUrls
+from classes.data import WriteCsv
 
-# from testlist import url_list
+# */* test object */*
+# from testlist import dict_list
 
 
 def Getemails(keywords, email):
@@ -33,11 +35,17 @@ def Getemails(keywords, email):
     ParsedClass = ParseUrls(CleanedClass.cleaned_urls)
     print(f'Parsed {len(ParsedClass.website_dicts_list)} urls!')
     
-    for dicts in ParsedClass.website_dicts_list:
-        print(dicts)
+    print('Going to write to mails.csv...')
+    WriteCsv(ParsedClass.website_dicts_list, keywords)
+    print('Succeeded to write to mails.csv!')
+    
     
 
 Getemails('restaurants purmerend', 'vossjea@gmail.com')
+
+
+
+
 
 
 
