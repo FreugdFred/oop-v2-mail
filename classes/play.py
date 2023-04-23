@@ -42,7 +42,7 @@ class LoadGooglePage:
         
     def Stopscrolling(self, start_time, html_page) -> bool:
         # stop scrolling if time > 180 seconds or html page includes one of PAGEENDINGSLIST
-        return any(x in html_page for x in self.PAGEENDINGSLIST) or time.time() - start_time > 180
+        return any(x in html_page for x in self.PAGEENDINGSLIST) or time.time() - start_time > 60
     
     def Googlepage(self) -> list:
         allhrefsList = []
@@ -50,7 +50,7 @@ class LoadGooglePage:
         with sync_playwright() as plays:
 
             # load user agent and start scrolling
-            browser = plays.chromium.launch(headless=False, slow_mo=50) #headless=False, slow_mo=50
+            browser = plays.chromium.launch() #headless=False, slow_mo=50
             context = browser.new_context(user_agent=self.USERAGENT)
             context.add_cookies(self.JSONCOOKIE)
 

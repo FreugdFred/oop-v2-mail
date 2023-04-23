@@ -6,7 +6,7 @@ import time
 
 class CleanHrefs:
     def __init__(self, hrefList):
-        self.hrefList = hrefList
+        self.hrefList = list(filter(lambda item: item is not None, hrefList))
         self.google_bool = self.Checkamountgooglehref()
         
         self.HTTPLIST = ['https://', 'http://']
@@ -42,7 +42,10 @@ class CleanHrefs:
         return nogoogle_percentage > 30
     
     def Geturlfromplace(self, href) -> str or None:
-        html_request_body = requests.get(href, headers=self.USERAGENT_REQUEST, cookies=self.GOOGLE_COOKIE_REQUEST).text
+        try:
+            html_request_body = requests.get(href, headers=self.USERAGENT_REQUEST, cookies=self.GOOGLE_COOKIE_REQUEST).text
+        except Exception:
+            return None
 
         # dont let google block us :)
         time.sleep(0.5)

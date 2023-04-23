@@ -12,25 +12,32 @@ from classes.play import LoadGooglePage
 from classes.clean import CleanHrefs
 from classes.parse import ParseUrls
 
-from testlist import url_list
+# from testlist import url_list
 
 
-# def Getemails(keywords, email):
-#     UserClass = UserInfo(email, keywords)
-#     PlaywrightClass = LoadGooglePage(keywords)
+def Getemails(keywords, email):
+    UserClass = UserInfo(email, keywords)
     
-#     href_list = PlaywrightClass.Printhrefs()
-#     # cleaned_hreflist = CleanHrefs(href_list)
+    print('Loading the google page....')
+    PlaywrightClass = LoadGooglePage(keywords)
+    print('Google page loaded successfully!')
     
-#     print(href_list)
+    href_list = PlaywrightClass.Printhrefs()
+    print(f'Found {len(href_list)} hrefs in the google page!')
+    print('Now going to clean the hrefs from the google page....')
+    
+    CleanedClass = CleanHrefs(href_list)
+    print(f'Cleaned {len(CleanedClass.cleaned_urls)} links from the google page!')
+    print('Now going parse emails from the urls....')
+    
+    ParsedClass = ParseUrls(CleanedClass.cleaned_urls)
+    print(f'Parsed {len(ParsedClass.website_dicts_list)} urls!')
+    
+    for dicts in ParsedClass.website_dicts_list:
+        print(dicts)
     
 
-# Getemails('restaurants purmerend', 'vossjea@gmail.com')
-
-
-# hrefClass = CleanHrefs(hreflist)
-
-ParsedClass = ParseUrls(url_list)
+Getemails('restaurants purmerend', 'vossjea@gmail.com')
 
 
 
