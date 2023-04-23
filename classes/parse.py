@@ -13,27 +13,26 @@ class ParseUrls:
         # Find every email on the home page and if no email find contact href
         for url in url_list:
             html_body = self.Makerequest(url)
-            emails_set = self.Getemailfromhtml(html_body)
             
-            if not emails_set:
+            if emails_set := self.Getemailfromhtml(html_body):
+                self.Makedictwebsite(url, emails_set, '')
+            else:
                 contact_url = self.Findcontacthref(html_body, url)
                 self.Makedictwebsite(url, emails_set, contact_url)
                 
-            self.Makedictwebsite(url, emails_set, '')
-            
-        
+                
         # if dict has contacturl the make request and scrape the email from the html body
         for dicts in self.website_dicts_list:
             if contact_url := dicts['contacturl']:
                 html_body = self.Makerequest(contact_url)
                 dicts['emails'] = self.Getemailfromhtml(html_body)
                 dicts['level'] = 'sure'
-                
-                
+
+
         # for every other link that hasnt gotten a email, make one from url
         for dicts in self.website_dicts_list:
             if not dicts['emails']:
-                dicts['emails'] = self.Makeemailfromurl(url)
+                dicts['emails'] = self.Makeemailfromurl(dicts['website'])
                 dicts['level'] = 'not sure'
 
 

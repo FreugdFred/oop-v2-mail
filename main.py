@@ -32,6 +32,12 @@ def Getemails(keywords, email):
     print(f'Cleaned {len(CleanedClass.cleaned_urls)} links from the google page!')
     print('Now going parse emails from the urls....')
     
+    """
+    Make Parse acync and done!!!!!!!!!!!!!!!
+    """
+    
+    
+    
     ParsedClass = ParseUrls(CleanedClass.cleaned_urls)
     print(f'Parsed {len(ParsedClass.website_dicts_list)} urls!')
     
