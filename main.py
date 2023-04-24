@@ -6,7 +6,6 @@ list = listName
 def function = Calcname
 filename = filename
 """
-import sys
 import time
 
 from classes.info import UserInfo
@@ -16,7 +15,7 @@ from classes.parse import ParseUrls
 from classes.data import WriteCsv
 
 # */* test object */*
-# from testlist import scraped_url_list
+from testlist import scraped_url_list
 
 
 def Getemails(keywords, email):
@@ -41,14 +40,15 @@ def Getemails(keywords, email):
     WriteCsv(ParsedClass.website_dicts_list, keywords)
     print('Succeeded to write to mails.csv!')
     
+    return len(ParsedClass.website_dicts_list), keywords
+    
     
 start = time.time()
-Getemails('Advocaten purmerend', 'vossjea@gmail.com')
-print(f'Time it Took: {time.time() - start}')
+length_list, keywords = Getemails('advocaten Amsterdam', 'vossjea@gmail.com')
+print(f'Time it Took: {time.time() - start} and got {length_list} contacts for keywords {keywords}')
 
 # Time it Took: 296.6787919998169 cync: Restaurants Purmerend
+# Time it Took: 113.61417484283447 cync: Advocaten purmerend
 
-
-
-
-
+# Time it Took: 162.68579006195068 acync: Restaurants Purmerend
+# Time it Took: 13.08481478691101 acync: Advocaten purmerend

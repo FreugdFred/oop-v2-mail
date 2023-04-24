@@ -1,11 +1,13 @@
 from bs4 import BeautifulSoup
+import httpx
+import asyncio
 import requests
 import re
 
 
 class ParseUrls:
     '''
-    tldr: Get url list and scrape it to get an email
+    tldr: Get url list and scrape it to get emails
     1. Go to home page and search for emails
     2 . No emails? search for contact url
     3. Go to contact url and search for emails
@@ -19,10 +21,10 @@ class ParseUrls:
         self.CONTACT_LIST = ['over', 'Over', 'team', 'Team', 'Contact', 'contact']
 
         # make request for every url in url_list then store it in a list
-        url_requests_list = [self.Makerequest(url) for url in self.url_list]
+        url_requests_list = asyncio.run(self.asyncurlrequestsoperator())
         
         # see if request html body contains email if not find Findcontacthref | add to website_dicts_list
-        for request, url in zip(url_requests_list, url_list):
+        for request, url in zip(url_requests_list, self.url_list):
             if emails_set := self.Getemailfromhtml(request):
                 self.website_dicts_list.append(self.Makedictwebsite(url, emails_set, ''))
             else:
@@ -33,8 +35,7 @@ class ParseUrls:
     	# find every dict who doesnt have a email and has contact url
         # make request to that contact url and store it in contact_url_request_list
         contact_url_list = [dicts for dicts in self.website_dicts_list if dicts['contacturl']]
-        contact_url_request_list = [self.Makerequest(dicts['contacturl']) for dicts in self.website_dicts_list]
-        
+        contact_url_request_list = asyncio.run(self.asynccontacturlrequestsoperator())
         
         # zip trough contact_url_list, contact_url_request_list and see if contact page contains email, if so add new dict destroy cold one
         for dicts, request in zip(contact_url_list, contact_url_request_list):
@@ -47,18 +48,25 @@ class ParseUrls:
             if not dicts['emails']:
                 dicts['emails'] = self.Makeemailfromurl(dicts['website'])
                 dicts['level'] = 'not sure'
-
+                
+                
+    async def asynccontacturlrequestsoperator(self):
+        async with httpx.AsyncClient() as client:
+            contact_url_request_async_list = [self.Makerequest(dicts['contacturl'], client) for dicts in self.website_dicts_list]
+            contact_url_request_list = await asyncio.gather(*contact_url_request_async_list)
+        return contact_url_request_list
+                
+    async def asyncurlrequestsoperator(self):
+        async with httpx.AsyncClient() as client:
+            url_requests_async_list = [self.Makerequest(url, client) for url in self.url_list]
+            url_requests_list = await asyncio.gather(*url_requests_async_list)
+        return url_requests_list
 
     def Makeemailfromurl(self, url: str) -> set:
         # make a email from a url by parsing utrl the do info@ + url
         url = url.replace('/', ' ')
         url = url.replace('%', ' ')
-        url = url.replace('www.', ' ')
-        
-        for word in url.split():
-            if '.' in word:
-                url = f'info@{word.capitalize()}'
-                break
+        url = next((f'info@{word.capitalize()}' for word in url.split() if '.' in word), url.replace('www.', ' '),)
         return {url}
 
     def Findcontacthref(self, request: object, base_url: str) -> str:
@@ -95,8 +103,7 @@ class ParseUrls:
                 'contacturl' : contact_url,
             }
         
-        
-    def Getemailfromhtml(self, request: str) -> set:
+    def Getemailfromhtml(self, request: object) -> set:
         ''' find a email from the html body and return set '''
         try:
             html_body = request.text
@@ -106,11 +113,9 @@ class ParseUrls:
         emails_set = set(re.findall(r'[\w._%+-]+@[A-Za-z.-]+\.[A-Z|a-z]{2,}', html_body, re.I))
         return {x.lower() for x in emails_set}
     
-    def Makerequest(self, url) -> str:
-        ''' try to make request and get html body, if except return empty string '''
+    async def Makerequest(self, url, client) -> object:
+        ''' try to make request and get request object, if except return empty string '''
         try:
-            return requests.get(url, headers=self.USERAGENT_REQUEST)
+            return await client.get(url, headers=self.USERAGENT_REQUEST)
         except Exception:
             return ''
-
-    
