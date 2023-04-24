@@ -2,7 +2,13 @@ import csv
 
 
 class WriteCsv:
-    def __init__(self, dict_list, keywords):
+    '''
+    Write email data dicts to mails.csv with with header and footer
+    Header includes keywords and rows
+    Footer includes credits to Me
+    Nothing stored nothing returned
+    '''
+    def __init__(self, dict_list: list, keywords: str):
         self.dict_list = dict_list
         self.keywords = keywords
         
@@ -11,19 +17,22 @@ class WriteCsv:
         self.Openandwrite()
         
     
-    def Writeheader(self, writer, f):
+    def Writeheader(self, writer: object, f: object):
+        '''Write csv header with keywords'''
         writer.writerow({'website': 'Keywords used', 'emails': self.keywords})
         writer.writeheader()
         f.write('\n')
         
     
-    def Writebody(self, writer):            
+    def Writebody(self, writer: object):   
+        '''Write all the data from the script in the csv file'''        
         for data in self.dict_list:
             email_string = ', '.join(data['emails'])
             data['emails'] = email_string
             writer.writerow(data)
             
-    def Writefooter(self, writer, f):
+    def Writefooter(self, writer: object, f: object):
+        ''' Write footer with credits to akula_Arthur '''
         f.write('\n')
         f.write('\n')
         
@@ -31,6 +40,7 @@ class WriteCsv:
         writer.writerow({'website': 'Made by akula_Arthur'})
 
     def Openandwrite(self):
+        ''' Open mails.csv and write header, body, and footer data to csv '''
         with open('mails.csv', 'a', encoding='UTF-8', newline='') as f:
             writer = csv.DictWriter(f, fieldnames=self.FIELDNAMES)
             

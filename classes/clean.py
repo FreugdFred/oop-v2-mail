@@ -5,7 +5,13 @@ import time
 
 
 class CleanHrefs:
-    def __init__(self, hrefList):
+    '''
+    Look if email list contains to much google links, if to much google links then scrape website url from the google/place
+    and put it in the list, delete the non google urls
+    if not to much google urls, then delete google urls
+    End product stored in cleaned_urls
+    '''
+    def __init__(self, hrefList: list):
         self.hrefList = list(filter(lambda item: item is not None, hrefList))
         self.google_bool = self.Checkamountgooglehref()
         
@@ -26,22 +32,23 @@ class CleanHrefs:
         self.cleaned_urls = list(filter(lambda item: item is not None, self.cleaned_urls))
         
     
-    def Removenongoogleurls(self, url):
-        # if google not in url the return None else return url
+    def Removenongoogleurls(self, url) -> str or None:
+        ''' if google not in url the return None else return url '''
         return url if 'google' in url else None
                 
-    def Removegoogleurls(self, url):
-        # return url if url does not conatin componemnts of SKIP_URL_LIST
+    def Removegoogleurls(self, url) -> str or None:
+        ''' return url if url does not conatin componemnts of SKIP_URL_LIST '''
         return url if all(x not in url for x in self.SKIP_URL_LIST) else None
         
     def Checkamountgooglehref(self) -> bool:
+        ''' return True if more then 30% are not google links '''
         # sourcery skip: inline-variable, simplify-numeric-comparison
-        # return True if more then 30% are not google links
         nogoogle_amount = sum('www.google' not in href for href in self.hrefList)
         nogoogle_percentage = nogoogle_amount / len(self.hrefList) * 100
         return nogoogle_percentage > 30
     
     def Geturlfromplace(self, href) -> str or None:
+        ''' Fetch website url from google place html body '''
         try:
             html_request_body = requests.get(href, headers=self.USERAGENT_REQUEST, cookies=self.GOOGLE_COOKIE_REQUEST).text
         except Exception:

@@ -6,7 +6,14 @@ import json
 
 
 class LoadGooglePage:
-    def __init__(self, KEYWORDS):
+    '''
+    Load a the google url in Plawright
+    Scroll through the bottom of the page
+    If the loads takes more then 60 sec then stop Playwright
+    If skip end of page list in the html body, then stop Playwright
+    End product of all parsed hrefs from the html body stored in ALLHREFS
+    '''
+    def __init__(self, KEYWORDS: str):
         self.KEYWORDS = KEYWORDS
         self.URL = self.Makeurl()
         self.JSONCOOKIE = self.Loadcookie()
@@ -18,33 +25,36 @@ class LoadGooglePage:
         self.ALLHREFS = self.Googlepage()
         
     def Printhrefs(self):
+        ''' print all hrefs in ALLHREFS '''
         return self.ALLHREFS
     
     def Makeurl(self) -> str:
+        ''' Make a google search query link from the keywords'''
         return f"https://www.google.nl/maps/search/{self.KEYWORDS.replace(' ', '+')}"
     
     def Loadcookie(self) -> dict:
-        # load cookie file to playwright
+        ''' load cookie file to playwright '''
         cookie_file = open('cookie.json')
         return json.load(cookie_file)
     
-    def Gethref(self, html_page) -> list:
-        # get all ancher tags and hrefs, then look if href doesnt contain special string in SKIPHREFLIST
+    def Gethref(self, html_page: str) -> list:
+        ''' get all ancher tags and hrefs, then look if href doesnt contain special string in SKIPHREFLIST '''
         soup = BeautifulSoup(html_page, 'lxml')
         hrefItter = (link.get('href') for link in soup.find_all('a') if link.get('href'))
         return (href for href in hrefItter if not any(x for x in self.SKIPHREFLIST if x in href))
     
-    def Scrolltohref(self, page, href) -> None:
-        # scroll to href into view if needed with playwright
+    def Scrolltohref(self, page: object, href: str) -> None:
+        ''' scroll to href into view if needed with playwright '''
         page.wait_for_timeout(1000)
         element = page.locator(f'[href="{href}"]').nth(-1)
         element.scroll_into_view_if_needed()  
         
-    def Stopscrolling(self, start_time, html_page) -> bool:
-        # stop scrolling if time > 180 seconds or html page includes one of PAGEENDINGSLIST
+    def Stopscrolling(self, start_time: float, html_page: str) -> bool:
+        ''' stop scrolling if time > 180 seconds or html page includes one of PAGEENDINGSLIST '''
         return any(x in html_page for x in self.PAGEENDINGSLIST) or time.time() - start_time > 60
     
     def Googlepage(self) -> list:
+        ''' Load the google page and start scrolling untill th end, then close and get all the hrefs from the html page'''
         allhrefsList = []
         start_time = time.time()
         with sync_playwright() as plays:
