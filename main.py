@@ -43,11 +43,10 @@ def Getemails(keywords, email):
     
     
 start = time.time()
-Getemails('restaurants purmerend', 'vossjea@gmail.com')
+Getemails('Advocaten purmerend', 'vossjea@gmail.com')
 print(f'Time it Took: {time.time() - start}')
 
-
-# Time it Took: 296.6787919998169 cync
+# Time it Took: 296.6787919998169 cync: Restaurants Purmerend
 
 
 
