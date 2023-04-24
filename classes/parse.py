@@ -10,30 +10,61 @@ class ParseUrls:
         self.website_dicts_list = []
         self.CONTACT_LIST = ['over', 'Over', 'team', 'Team', 'Contact', 'contact']
 
-        # Find every email on the home page and if no email find contact href
-        for url in url_list:
-            html_body = self.Makerequest(url)
-            
-            if emails_set := self.Getemailfromhtml(html_body):
-                self.Makedictwebsite(url, emails_set, '')
+        # make request for every url in url_list then store it in a list
+        url_requests_list = [self.Makerequest(url) for url in self.url_list]
+        
+        for urls in url_requests_list:
+            print(urls)
+        
+        
+        # see if request html body contains email if not find Findcontacthref | add to website_dicts_list
+        for request in url_requests_list:
+            if emails_set := self.Getemailfromhtml(request):
+                self.website_dicts_list.append(self.Makedictwebsite(request.url, emails_set, ''))
             else:
-                contact_url = self.Findcontacthref(html_body, url)
-                self.Makedictwebsite(url, emails_set, contact_url)
+                contact_url = self.Findcontacthref(request, request.url)
+                self.website_dicts_list.append(self.Makedictwebsite(request.url, emails_set, contact_url))
                 
                 
-        # if dict has contacturl the make request and scrape the email from the html body
-        for dicts in self.website_dicts_list:
-            if contact_url := dicts['contacturl']:
-                html_body = self.Makerequest(contact_url)
-                dicts['emails'] = self.Getemailfromhtml(html_body)
-                dicts['level'] = 'sure'
 
-
+    	# find every dict who doesnt have a email and has contact url
+        # make request to that contact url and store it in contact_url_request_list
+        contact_url_list = [dicts for dicts in self.website_dicts_list if dicts['contacturl']]
+        contact_url_request_list = [self.Makerequest(dicts['contacturl']) for dicts in self.website_dicts_list]
+        
+        
+        # zip trough contact_url_list, contact_url_request_list and see if contact page contains email, if so add new dict destroy cold one
+        for dicts, request in zip(contact_url_list, contact_url_request_list):
+            if emails_set := self.Getemailfromhtml(request):
+                self.website_dicts_list.append(self.Makedictwebsite(dicts['website'], emails_set, request.url)) 
+                self.website_dicts_list.remove(dicts)
+        
         # for every other link that hasnt gotten a email, make one from url
         for dicts in self.website_dicts_list:
             if not dicts['emails']:
                 dicts['emails'] = self.Makeemailfromurl(dicts['website'])
                 dicts['level'] = 'not sure'
+                
+
+        # # Find every email on the home page and if no email find contact href
+        # for url in url_list:
+        #     html_body = self.Makerequest(url)
+            
+        #     if emails_set := self.Getemailfromhtml(html_body):
+        #         self.Makedictwebsite(url, emails_set, '')
+        #     else:
+        #         contact_url = self.Findcontacthref(html_body, url)
+        #         self.Makedictwebsite(url, emails_set, contact_url)
+                
+                
+        # if dict has contacturl the make request and scrape the email from the html body
+        # for dicts in self.website_dicts_list:
+        #     if contact_url := dicts['contacturl']:
+        #         html_body = self.Makerequest(contact_url)
+        #         dicts['emails'] = self.Getemailfromhtml(html_body)
+        #         dicts['level'] = 'sure'
+
+
 
 
     def Makeemailfromurl(self, url) -> set:
@@ -48,12 +79,17 @@ class ParseUrls:
                 break
         return {url}
 
-    def Findcontacthref(self, html_body, base_url) -> str:
+    def Findcontacthref(self, request, base_url) -> str:
         '''
         bs4 finds every href tag, if the href tags matches self.CONTACT_LIST then look if the href tag contains a .
         if so return the href else paste the href behind the base_url and return it
         if None match then return emtry string
         '''
+        try:
+            html_body = request.text
+        except Exception:
+            return ''
+
         soup = BeautifulSoup(html_body, 'lxml')
         
         return next(
@@ -67,17 +103,16 @@ class ParseUrls:
             '',
         )
             
-    def Makedictwebsite(self, url, emails, contact_url) -> None:
+    def Makedictwebsite(self, url, emails, contact_url) -> dict:
         # fill in a dict with url information etc.
         level = 'sure' if emails else 'none'
-        website_dict = {
+        return {
                 'website' : url, 
                 'emails' : emails,
                 'level' : level, 
                 'contacturl' : contact_url,
             }
         
-        self.website_dicts_list.append(website_dict)
         
     def Getemailfromhtml(self, html_body) -> set:
         # find a email from the html body and return set
@@ -87,7 +122,7 @@ class ParseUrls:
     def Makerequest(self, url) -> str:
         # try to make request and get html body, if except return emty string
         try:
-            return requests.get(url, headers=self.USERAGENT_REQUEST).text
+            return requests.get(url, headers=self.USERAGENT_REQUEST)
         except Exception:
             return ''
 
