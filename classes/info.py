@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from math import floor
 import time
 
 
@@ -26,7 +27,7 @@ class UserInfo:
         
     def TimeBetween(self):
         ''' Measure time between time first initiated to when called '''
-        return time.time() - self.STARTTIME
+        return floor(time.time() - self.STARTTIME)
         
         
     

@@ -2,7 +2,7 @@
 CONST = ALL CAPS
 variable = variable_name
 classes = ClassName
-list = listName
+list = name_list
 def function = Calcname
 filename = filename
 """
@@ -47,10 +47,10 @@ def Getemails(keywords, email):
 
 email = input(f'\n\n{bcolors.UNDERLINE}What is your email address?: ')
 keywords = input('The keywords you want to use: ')
-print(bcolors.ENDC, '\n\n')
+print(bcolors.ENDC, '\n')
 
 UserClass = Getemails(keywords, email)
-print(f'{bcolors.HEADER}[Statistic] Time it Took: {UserClass.TimeBetween()} and got {UserClass.EMAILLISTLENGTH} contacts for keywords: {UserClass.KEYWORDS}{bcolors.ENDC}')
+print(f'{bcolors.HEADER}[Statistic] Time it Took: {UserClass.TimeBetween()} seconds and got {UserClass.EMAILLISTLENGTH} contacts for keywords: {UserClass.KEYWORDS}{bcolors.ENDC}')
 
 
 # */* Test results */* 
