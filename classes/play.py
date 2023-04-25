@@ -24,7 +24,7 @@ class LoadGooglePage:
     
         self.ALLHREFS = self.Googlepage()
         
-    def Printhrefs(self):
+    def Printhrefs(self) -> list:
         ''' print all hrefs in ALLHREFS '''
         return self.ALLHREFS
     
@@ -54,7 +54,7 @@ class LoadGooglePage:
         return any(x in html_page for x in self.PAGEENDINGSLIST) or time.time() - start_time > 60
     
     def Googlepage(self) -> list:
-        ''' Load the google page and start scrolling untill th end, then close and get all the hrefs from the html page'''
+        ''' Load the google page and start scrolling untill th end, then close and get all the hrefs from the html page '''
         allhrefsList = []
         start_time = time.time()
         with sync_playwright() as plays:

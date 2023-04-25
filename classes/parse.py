@@ -24,46 +24,58 @@ class ParseUrls:
         url_requests_list = asyncio.run(self.asyncurlrequestsoperator())
         
         # see if request html body contains email if not find Findcontacthref | add to website_dicts_list
-        for request, url in zip(url_requests_list, self.url_list):
-            if emails_set := self.Getemailfromhtml(request):
-                self.website_dicts_list.append(self.Makedictwebsite(url, emails_set, ''))
-            else:
-                contact_url = self.Findcontacthref(request, url)
-                self.website_dicts_list.append(self.Makedictwebsite(url, emails_set, contact_url))
-
+        self.Findemailmakedictoperator(url_requests_list)
 
     	# find every dict who doesnt have a email and has contact url
         # make request to that contact url and store it in contact_url_request_list
         contact_url_list = [dicts for dicts in self.website_dicts_list if dicts['contacturl']]
         contact_url_request_list = asyncio.run(self.asynccontacturlrequestsoperator())
         
-        # zip trough contact_url_list, contact_url_request_list and see if contact page contains email, if so add new dict destroy cold one
-        for dicts, request in zip(contact_url_list, contact_url_request_list):
-            if emails_set := self.Getemailfromhtml(request):
-                self.website_dicts_list.append(self.Makedictwebsite(dicts['website'], emails_set, dicts['contacturl'])) 
-                self.website_dicts_list.remove(dicts)
-        
-        # for every other link that hasnt gotten a email, make one from url
-        for dicts in self.website_dicts_list:
-            if not dicts['emails']:
-                dicts['emails'] = self.Makeemailfromurl(dicts['website'])
-                dicts['level'] = 'not sure'
+        self.Trycontacturltodictoperator(contact_url_list, contact_url_request_list)
+        self.Makeurltoemailoperator()
+
                 
                 
-    async def asynccontacturlrequestsoperator(self):
+    async def asynccontacturlrequestsoperator(self) -> list:
+        ''' async function that makes requests to all the contact urls '''
         async with httpx.AsyncClient() as client:
             contact_url_request_async_list = [self.Makerequest(dicts['contacturl'], client) for dicts in self.website_dicts_list]
             contact_url_request_list = await asyncio.gather(*contact_url_request_async_list)
         return contact_url_request_list
                 
-    async def asyncurlrequestsoperator(self):
+    async def asyncurlrequestsoperator(self) -> list:
+        ''' async function that makes requests to all the urls '''
         async with httpx.AsyncClient() as client:
             url_requests_async_list = [self.Makerequest(url, client) for url in self.url_list]
             url_requests_list = await asyncio.gather(*url_requests_async_list)
         return url_requests_list
+    
+    def Findemailmakedictoperator(self, url_requests_list:list):
+        ''' see if request html body contains email if not find Findcontacthref | add to website_dicts_list '''
+        for request, url in zip(url_requests_list, self.url_list):
+            if emails_set := self.Getemailfromhtml(request):
+                self.website_dicts_list.append(self.Makedictwebsite(url, emails_set, ''))
+            else:
+                contact_url = self.Findcontacthref(request, url)
+                self.website_dicts_list.append(self.Makedictwebsite(url, emails_set, contact_url))
+    
+    def Makeurltoemailoperator(self) -> None:
+        ''' for every other link that hasnt gotten a email, make one from url '''
+        for dicts in self.website_dicts_list:
+            if not dicts['emails']:
+                dicts['emails'] = self.Makeemailfromurl(dicts['website'])
+                dicts['level'] = 'not sure'
+
+    def Trycontacturltodictoperator(self, contact_url_list:list, contact_url_request_list:list) -> None:
+        ''' zip trough contact_url_list, contact_url_request_list and see if contact page contains email, if so add new dict destroy old one '''
+        for dicts, request in zip(contact_url_list, contact_url_request_list):
+            if emails_set := self.Getemailfromhtml(request):
+                self.website_dicts_list.append(self.Makedictwebsite(dicts['website'], emails_set, dicts['contacturl'])) 
+                self.website_dicts_list.remove(dicts)
+
 
     def Makeemailfromurl(self, url: str) -> set:
-        # make a email from a url by parsing utrl the do info@ + url
+        ''' make a email from a url by parsing utrl the do info@ + url '''
         url = url.replace('/', ' ')
         url = url.replace('%', ' ')
         url = next((f'info@{word.capitalize()}' for word in url.split() if '.' in word), url.replace('www.', ' '),)

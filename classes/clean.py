@@ -32,11 +32,11 @@ class CleanHrefs:
         self.cleaned_urls = list(filter(lambda item: item is not None, self.cleaned_urls))
         
     
-    def Removenongoogleurls(self, url) -> str or None:
+    def Removenongoogleurls(self, url:str) -> str or None:
         ''' if google not in url the return None else return url '''
         return url if 'google' in url else None
                 
-    def Removegoogleurls(self, url) -> str or None:
+    def Removegoogleurls(self, url:str) -> str or None:
         ''' return url if url does not conatin componemnts of SKIP_URL_LIST '''
         return url if all(x not in url for x in self.SKIP_URL_LIST) else None
         
@@ -47,7 +47,7 @@ class CleanHrefs:
         nogoogle_percentage = nogoogle_amount / len(self.hrefList) * 100
         return nogoogle_percentage > 30
     
-    def Geturlfromplace(self, href) -> str or None:
+    def Geturlfromplace(self, href:str) -> str or None:
         ''' Fetch website url from google place html body '''
         try:
             html_request_body = requests.get(href, headers=self.USERAGENT_REQUEST, cookies=self.GOOGLE_COOKIE_REQUEST).text
