@@ -45,17 +45,13 @@ def Getemails(keywords, email):
     return UserClass
 
 
-
-
 keywords_list = []
-exit_loop = 'a'
-
 email = input(f'\n\n{bcolors.UNDERLINE}What is your email address?: ')
+keywords = 'Not none :)'
 
-while exit_loop:
-    keywords = input('The keywords you want to use: ')
-    keywords_list.append(keywords)
-    exit_loop = input('Press Enter if your done with the keywords, else press a and enter: ')
+while keywords:
+    keywords = input('The keywords you want to use (press Enter to start): ')
+    if keywords: keywords_list.append(keywords)
 
 
 print(bcolors.ENDC, '\n')
