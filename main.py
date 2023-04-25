@@ -45,13 +45,27 @@ def Getemails(keywords, email):
     return UserClass
 
 
+
+
+keywords_list = []
+exit_loop = 'a'
+
 email = input(f'\n\n{bcolors.UNDERLINE}What is your email address?: ')
-keywords = input('The keywords you want to use: ')
+
+while exit_loop:
+    keywords = input('The keywords you want to use: ')
+    keywords_list.append(keywords)
+    exit_loop = input('Press Enter if your done with the keywords, else press a and enter: ')
+
+
 print(bcolors.ENDC, '\n')
 
-UserClass = Getemails(keywords, email)
-print(f'{bcolors.HEADER}[Statistic] Time it Took: {UserClass.TimeBetween()} seconds and got {UserClass.EMAILLISTLENGTH} contacts for keywords: {UserClass.KEYWORDS}{bcolors.ENDC}')
+for keywords in keywords_list:
+    UserClass = Getemails(keywords, email)
+    print(f'{bcolors.HEADER}[Statistic] Time it Took: {UserClass.TimeBetween()} seconds and got {UserClass.EMAILLISTLENGTH} contacts for keywords: {UserClass.KEYWORDS}{bcolors.ENDC}\n\n')
 
+
+print(f'\n\n{bcolors.OKBLUE}All keywords completed! {bcolors.ENDC}')
 
 # */* Test results */* 
 
