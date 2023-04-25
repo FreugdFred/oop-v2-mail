@@ -44,6 +44,7 @@ def Getemails(keywords, email):
     UserClass.Addemaillist(ParsedClass.website_dicts_list)
     return UserClass
 
+
 email = input(f'\n\n{bcolors.UNDERLINE}What is your email address?: ')
 keywords = input('The keywords you want to use: ')
 print(bcolors.ENDC, '\n\n')
