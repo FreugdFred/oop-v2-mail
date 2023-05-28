@@ -1,0 +1,32 @@
+[
+  {
+    "name": "CONSENT",
+    "value": "PENDING+373",
+    "domain": ".google.nl",
+    "path": "/",
+    "expires": 1697012061.06835,
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "SOCS",
+    "value": "CAISNQgEEitib3FfaWRlbnRpdHlmcm9udGVuZHVpc2VydmVyXzIwMjIwOTA0LjE3X3AwGgJubCAEGgYIgJvamAY",
+    "domain": ".google.nl",
+    "path": "/",
+    "expires": 1696580062.171537,
+    "httpOnly": false,
+    "secure": true,
+    "sameSite": "Lax"
+  },
+  {
+    "name": "NID",
+    "value": "511=WjNaoKs6bBvjWwRcb-1DzfODXTHrUZn6xy-Zpu2st7qQqjE9zjLZpSLBqU9ynqNITWhnlkso4WhxXeiY-0XAiwisB4pA7DDHtIyrc-sBUPK8iNkOfoVhPZayqbtqXDglpjXR9vdt97K35BIJGWbSRPceYbL8qoz-Ix-KffJSi5E",
+    "domain": ".google.nl",
+    "path": "/",
+    "expires": 1678263262.256919,
+    "httpOnly": true,
+    "secure": false,
+    "sameSite": "Lax"
+  }
+]
