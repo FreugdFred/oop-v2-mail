@@ -34,13 +34,13 @@ def Getemails(keywords, email):
     print(f'{TherminalColor.OKCYAN}[Loading] Now going parse emails from the urls....{TherminalColor.ENDC}\n')
     
     parsed_object = ParseUrls(cleaned_object.cleaned_urls)
-    print(f'{TherminalColor.OKGREEN}[Info] Parsed {len(parsed_object.website_dicts_list)} urls!{TherminalColor.OKCYAN}')
+    print(f'{TherminalColor.OKGREEN}[Info] Parsed {len(parsed_object.url_list)} urls!{TherminalColor.OKCYAN}')
     
     print(f'{TherminalColor.OKCYAN}[Loading] Going to write to mails.csv...{TherminalColor.OKCYAN}\n')
-    WriteCsv(parsed_object.website_dicts_list, keywords)
+    WriteCsv(parsed_object.url_list, keywords)
     print(f'{TherminalColor.OKGREEN}[Info] Succeeded to write to mails.csv!{TherminalColor.OKCYAN}\n\n')
     
-    user_object.add_email_list(parsed_object.website_dicts_list)
+    user_object.add_email_list(parsed_object.url_list)
     return user_object
 
 
@@ -57,7 +57,7 @@ print(TherminalColor.ENDC, '\n')
 
 for keywords in keywords_list:
     user_object = Getemails(keywords, email)
-    print(f'{TherminalColor.HEADER}[Statistic] Time it Took: {user_object.TimeBetween()} seconds and got {user_object.EMAILLISTLENGTH} contacts for keywords: {user_object.KEYWORDS}{TherminalColor.ENDC}\n\n')
+    print(f'{TherminalColor.HEADER}[Statistic] Time it Took: {user_object.time_between()} seconds and got {user_object.EMAILLISTLENGTH} contacts for keywords: {user_object.KEYWORDS}{TherminalColor.ENDC}\n\n')
 
 
 print(f'\n\n{TherminalColor.OKBLUE}All keywords completed! {TherminalColor.ENDC}')

@@ -27,7 +27,10 @@ class WriteCsv:
         ''' Write all the data from the script in the csv file '''        
         for data in self.dict_list:
             email_string = ', '.join(data['emails'])
+            phonenumber_string = ', '.join(data['phonenumbers'])
+            
             data['emails'] = email_string
+            data['phonenumbers'] = phonenumber_string
             writer.writerow(data)
             
     def write_csv_footer(self, writer: object, f: object) -> None:
