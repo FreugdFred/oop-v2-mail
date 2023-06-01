@@ -71,6 +71,7 @@ class ParseUrls:
             return url_dict
         
     async def ansync_request_operator(self, contact_bool: bool) -> list:
+        '''Async request operator for all the urls in url_list, returns a list of dicts'''
         async with httpx.AsyncClient() as client:
             url_requests_async_list = [self.async_request_maker(url_dict, client, contact_bool) for url_dict in self.url_list]
             request_objects_list = await asyncio.gather(*url_requests_async_list)
@@ -142,7 +143,6 @@ class ParseUrls:
         phone_set = re.findall(r'(?:^|\s)(((?:\+|0{2})(?:49|43|33)[-\. ]?|0)([1-9]\d{1,2}[-\. ]?|\([1-9]\d{1,2}\)[-\. ]?)(\d{6,9}|\d{2,3}[-\. ]\d{4,6}))', html_body, re.I)
         phone_list = flatten_list(list(phone_set))
         return {phonenumber for phonenumber in phone_list if len(phonenumber) > 9}
-
         
         
 def flatten_list(l):
