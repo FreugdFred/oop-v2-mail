@@ -14,8 +14,6 @@ from classes.parse import ParseUrls
 from classes.data import WriteCsv
 from classes.color import TherminalColor
 
-# */* test object */*
-# from testlist import scraped_url_list
 
 def Getemails(keywords, email):
     user_object = UserInfo(email, keywords)
@@ -58,7 +56,6 @@ print(TherminalColor.ENDC, '\n')
 for keywords in keywords_list:
     user_object = Getemails(keywords, email)
     print(f'{TherminalColor.HEADER}[Statistic] Time it Took: {user_object.time_between()} seconds and got {user_object.EMAILLISTLENGTH} contacts for keywords: {user_object.KEYWORDS}{TherminalColor.ENDC}\n\n')
-
 
 print(f'\n\n{TherminalColor.OKBLUE}All keywords completed! {TherminalColor.ENDC}')
 
