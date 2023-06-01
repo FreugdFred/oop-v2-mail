@@ -6,7 +6,6 @@ import time
 @dataclass
 class UserInfo:
     '''User data includes email and keywords'''
-    IDCSV: str
     USEREMAIL: str
     KEYWORDS: str
     EMAILLIST: list = field(default_factory=list) 

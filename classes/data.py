@@ -11,7 +11,7 @@ class WriteCsv:
     def __init__(self, dict_list: list, keywords: str):
         self.dict_list = dict_list
         self.keywords = keywords
-        self.FIELDNAMES = ['website', 'emails', 'level', 'contacturl']
+        self.FIELDNAMES = ['website', 'emails', 'phonenumbers', 'level', 'contacturl']
         
         self.open_write_csv()
         

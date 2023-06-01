@@ -52,11 +52,13 @@ class ParseUrls:
     def find_email_make_dict(self, url_requests_list:list):
         ''' see if request html body contains email if not find find_contact_href | add to website_dicts_list '''
         for request, url in zip(url_requests_list, self.url_list):
+            phonenumber_set = self.find_phonenumber_from_html_body(request)
+            
             if emails_set := self.find_email_from_html_body(request):
-                self.website_dicts_list.append(self.make_website_dict(url, emails_set, ''))
+                self.website_dicts_list.append(self.make_website_dict(url, emails_set, phonenumber_set, ''))
             else:
                 contact_url = self.find_contact_href(request, url)
-                self.website_dicts_list.append(self.make_website_dict(url, emails_set, contact_url))
+                self.website_dicts_list.append(self.make_website_dict(url, emails_set, phonenumber_set, contact_url))
     
     def make_email_from_url_operator(self) -> None:
         ''' for every other link that hasnt gotten a email, make one from url '''
@@ -69,9 +71,9 @@ class ParseUrls:
         ''' zip trough contact_url_list, contact_url_request_list and see if contact page contains email, if so add new dict destroy old one '''
         for dicts, request in zip(contact_url_list, contact_url_request_list):
             if emails_set := self.find_email_from_html_body(request):
-                self.website_dicts_list.append(self.make_website_dict(dicts['website'], emails_set, dicts['contacturl'])) 
+                phonenumber_set = self.find_phonenumber_from_html_body(request)
+                self.website_dicts_list.append(self.make_website_dict(dicts['website'], emails_set, phonenumber_set, dicts['contacturl'])) 
                 self.website_dicts_list.remove(dicts)
-
 
     def make_email_from_url(self, url: str) -> set:
         ''' make a email from a url by parsing utrl the do info@ + url '''
@@ -104,12 +106,13 @@ class ParseUrls:
             '',
         )
             
-    def make_website_dict(self, website_url: str, emails: set, contact_url: str) -> dict:
+    def make_website_dict(self, website_url: str, emails: set, phonenumbers:set, contact_url: str) -> dict:
         ''' fill in a dict with url information etc. '''
         level = 'sure' if emails else 'none'
         return {
                 'website' : website_url, 
                 'emails' : emails,
+                'phonenumbers': phonenumbers,
                 'level' : level, 
                 'contacturl' : contact_url,
             }
@@ -124,9 +127,24 @@ class ParseUrls:
         emails_set = set(re.findall(r'[\w._%+-]+@[A-Za-z.-]+\.[A-Z|a-z]{2,}', html_body, re.I))
         return {x.lower() for x in emails_set}
     
+    def find_phonenumber_from_html_body(self, request: object) -> set:
+        ''' find a phonenumber from the html body and return set '''
+        try:
+            html_body = request.text
+        except Exception:
+            html_body = 'htpps://NONE.com'
+
+        phone_set = re.findall(r'(?:^|\s)(((?:\+|0{2})(?:49|43|33)[-\. ]?|0)([1-9]\d{1,2}[-\. ]?|\([1-9]\d{1,2}\)[-\. ]?)(\d{6,9}|\d{2,3}[-\. ]\d{4,6}))', html_body, re.I)
+        phone_list = flatten(list(phone_set))
+        return {phonenumber for phonenumber in phone_list if len(phonenumber) > 9}
+    
     async def async_request_maker(self, url, client) -> object:
         ''' try to make request and get request object, if except return empty string '''
         try:
             return await client.get(url, headers=self.USERAGENT_REQUEST)
         except Exception:
             return ''
+        
+        
+def flatten(l):
+    return [item for sublist in l for item in sublist]

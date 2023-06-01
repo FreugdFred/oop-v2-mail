@@ -17,7 +17,6 @@ from classes.color import TherminalColor
 # */* test object */*
 # from testlist import scraped_url_list
 
-
 def Getemails(keywords, email):
     user_object = UserInfo(email, keywords)
     print(f'{TherminalColor.HEADER}User: {email} sended keywords: {keywords}{TherminalColor.ENDC} \n\n')
@@ -26,7 +25,7 @@ def Getemails(keywords, email):
     playwright_object = LoadGooglePage(keywords)
     print(f'{TherminalColor.OKGREEN}[Info] Google page loaded successfully!{TherminalColor.ENDC}\n')
     
-    href_list = playwright_object.Printhrefs()
+    href_list = playwright_object.return_hrefs()
     print(f'{TherminalColor.OKGREEN}[Info] Found {len(href_list)} hrefs in the google page!{TherminalColor.ENDC}')
     print(f'{TherminalColor.OKCYAN}[Loading] Now going to clean the hrefs from the google page....{TherminalColor.ENDC}\n')
     
@@ -41,7 +40,7 @@ def Getemails(keywords, email):
     WriteCsv(parsed_object.website_dicts_list, keywords)
     print(f'{TherminalColor.OKGREEN}[Info] Succeeded to write to mails.csv!{TherminalColor.OKCYAN}\n\n')
     
-    user_object.Addemaillist(parsed_object.website_dicts_list)
+    user_object.add_email_list(parsed_object.website_dicts_list)
     return user_object
 
 
@@ -63,8 +62,8 @@ for keywords in keywords_list:
 
 print(f'\n\n{TherminalColor.OKBLUE}All keywords completed! {TherminalColor.ENDC}')
 
-# */* Test results */* 
 
+# */* Test results */* 
 
 # Time it Took: 296.6787919998169 cync: Restaurants Purmerend
 # Time it Took: 113.61417484283447 cync: Advocaten purmerend

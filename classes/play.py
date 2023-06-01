@@ -1,4 +1,3 @@
-import contextlib
 from playwright.sync_api import sync_playwright
 from bs4 import BeautifulSoup
 import time
@@ -34,7 +33,7 @@ class LoadGooglePage:
     
     def load_google_cookie(self) -> dict:
         ''' load cookie file to playwright '''
-        cookie_file = open('csvGen/cookie.json')
+        cookie_file = open('cookie.json')
         return json.load(cookie_file)
     
     def get_hrefs_from_html_page(self, html_page: str) -> list:
